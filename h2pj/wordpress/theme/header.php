@@ -48,11 +48,14 @@ require_once(get_template_directory() . '/config.php');
 <body>
   <header>
     <hgroup>
-      <h1 class="handihouse left">HandiHouse project<h1>
-      <?php // topの場合 ?>
-      <?php if (is_front_page()): ?>
-      <span id="delimiter">|</span><h1><a href="<?php echo get_bloginfo('home') . H2PJ_PATH_ABOUT; ?>">Enter</a></h1>
-      <?php endif; ?>
+      <ul>
+        <li><h1 class="handihouse left">HandiHouse project</h1></li>
+        <?php // topの場合 ?>
+        <?php if (is_front_page()): ?>
+        <li><span id="delimiter">|</span></li>
+        <li><h1><a href="<?php echo get_bloginfo('home') . H2PJ_PATH_ABOUT; ?>">Enter</a></h1></li>
+        <?php endif; ?>
+      </ul>
     </hgroup>
     <div class="hr"></div>
     <?php // top以外の場合 ?>
