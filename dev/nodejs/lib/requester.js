@@ -24,9 +24,8 @@ Requester.prototype.interval = 10;
 
 /**
  * HTTPリクエストを実行する
- * @param {string} 設定のインデックス
  */
-Requester.prototype.request = function() {
+Requester.prototype.execute = function() {
   for (var index in this.config) {
     console.info('http request[%s]: %s', index, this.config[index].uri);
 
@@ -44,11 +43,15 @@ Requester.prototype.request = function() {
         }
       });
 
-    this._request(index);
+    this.request(index);
   }
 }
 
-Requester.prototype._request = function(index) {
+/**
+ * HTTPリクエストを実行する
+ * @param {string} 設定のインデックス
+ */
+Requester.prototype.request = function(index) {
   var
     requester = this,
     uri = url.parse(this.config[index].uri),

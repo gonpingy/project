@@ -19,7 +19,7 @@ var Scraper = function(config) {
 util.inherits(Scraper, events.EventEmitter);
 module.exports = Scraper;
 
-Scraper.prototype.data = [];
+Scraper.prototype.result = [];
 Scraper.prototype.interval = 10;
 
 /**
@@ -91,8 +91,8 @@ Scraper.prototype.request = function(index) {
 /**
  * スクレイピングを実行する
  */
-Scraper.prototype.scrape = function() {
-  this.data = [], indexList = [];
+Scraper.prototype.execute = function() {
+  this.result = [], indexList = [];
 
   // 設定配列のインデックスを抽出
   for (index in this.config) {
@@ -100,11 +100,11 @@ Scraper.prototype.scrape = function() {
   }
 
   this
-    .on('scrape', function() {
+    .on('execute', function() {
       // 一定範囲のスクレイピングが完了
       this.once(this.scrapeEventType(indexList[0]), function() {
         // 次の範囲のスクレイピング実行
-        this.emit('scrape');
+        this.emit('execute');
       });
 
       // 全て並列で処理すると落ちてしまうため
@@ -139,18 +139,18 @@ Scraper.prototype.scrape = function() {
           // スクレイピング後の処理
           .once(this.scrapedEventType(index), this.config[index].scraped)
           // Scraper内部でのスクレイピング後の処理
-          .once(this.scrapedEventType(index), function(data, index) {
+          .once(this.scrapedEventType(index), function(result, index) {
             // スクレイピング結果を保存
-            this.data[index] = data;
+            this.result[index] = result;
 
-            console.log('scraped[%s]: %d/%d', index, this.data.length, this.config.length);
+            console.log('scraped[%s]: %d/%d', index, this.result.length, this.config.length);
 
             // 全てのスクレイピングが完了した場合
-            if (this.data.length == this.config.length) {
+            if (this.result.length == this.config.length) {
               this.emit('scraped');
             // 一定範囲のスクレイピングが完了したら再度スクレイピング
             // 前回の範囲の処理が終わりきっていない場合があるため、リスナーが登録されているかもチェックする
-            } else if (this.data.length % this.interval == 0 && this._events[this.scrapeEventType(index)]) {
+            } else if (this.result.length % this.interval == 0 && this._events[this.scrapeEventType(index)]) {
               this.emit(this.scrapeEventType(index));
             }
           });
@@ -160,7 +160,7 @@ Scraper.prototype.scrape = function() {
       }
     });
 
-  this.emit('scrape');
+  this.emit('execute');
 }
 
 Scraper.prototype.scrapedEventType = function(index) {
@@ -168,7 +168,7 @@ Scraper.prototype.scrapedEventType = function(index) {
 }
 
 Scraper.prototype.scrapeEventType = function(index) {
-  return 'scrape-' + Math.floor(index / this.interval);
+  return 'execute-' + Math.floor(index / this.interval);
 }
 
 Scraper.prototype.scrapingEventType = function(index) {
