@@ -9,8 +9,8 @@ var insertStation = function(geo) {
   });
 }
 
-dir = '~/Dropbox/Daikonactor/temp/yolp_prefecture/';
-prefectureDirList = fs.readdirSync('~/Dropbox/Daikonactor/temp/yolp_prefecture/');
+dir = '/Users/gonpingy/Dropbox/Daikonactor/temp/yolp_prefecture/';
+prefectureDirList = fs.readdirSync(dir);
 
 var config_sql = []
 var sql = 'INSERT INTO station(name, prefecture_id, line_id, latlng, address) VALUES(?, ?, ?, GeomFromText(?), ?)';

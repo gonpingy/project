@@ -19,8 +19,107 @@ var Scraper = function(config) {
 util.inherits(Scraper, events.EventEmitter);
 module.exports = Scraper;
 
-Scraper.prototype.result = [];
 Scraper.prototype.interval = 10;
+Scraper.prototype.result = [];
+
+/**
+ * スクレイピングを実行する
+ */
+Scraper.prototype.execute = function(callback) {
+  this.result = [], indexList = [];
+
+  // 設定配列のインデックスを抽出
+  for (index in this.config) {
+    indexList.push(index);
+  }
+
+  // 処理終了後のコールバックが設定されている場合
+  if (callback) {
+    this.on('executed', callback);
+  }
+
+  this
+    .on('execute', function() {
+      // 一定範囲のスクレイピングが完了
+      this.once(this.executeEvent(indexList[0]), function() {
+        // 次の範囲のスクレイピング実行
+        this.emit('execute');
+      });
+
+      // 全て並列で処理すると落ちてしまうため
+      // intervalに設定されている数で分割して処理していく
+      for (var i = 0; i < this.interval; i++) {
+        index = indexList.shift();
+
+        // 設定がまだある場合
+        if (index !== undefined) {
+          // リモートへアクセス
+          if (this.config[index].uri) {
+            this.request(index);
+          // ローカルファイル読み込み
+          } else {
+            this.read(index);
+          }
+
+          this
+            // スクレイピング対象のHTML取得後のスクレイピング処理
+            .once(this.scrapingEventType(index), function(index, html) {
+              self = this;
+
+              console.log('scraping[%s]', index);
+
+              // スクレイピング設定のインデックスをHTML内にコメントとして無理矢理入れこむ
+              // スクレイピングメソッドではこのコメントからインデックスを抽出し、どの設定でのスクレイピングか判別できるようにする
+              jsdom.env(
+                html.replace('</body>', '<!--' + index + '--></body>'),
+                ['http://code.jquery.com/jquery-1.6.min.js'],
+                this.config[index].scraping
+              );
+            })
+          // スクレイピング後の処理
+          .once(this.executedEvent(index), this.config[index].executed)
+          // Scraper内部でのスクレイピング後の処理
+          .once(this.executedEvent(index), function(index, result) {
+            // スクレイピング結果を保存
+            this.result[index] = result;
+
+            console.log('executed[%s]: %d/%d', index, this.result.length, this.config.length);
+
+            // 全てのスクレイピングが完了した場合
+            if (this.result.length == this.config.length) {
+              this.emit('executed');
+            // 一定範囲のスクレイピングが完了したら再度スクレイピング
+            // 前回の範囲の処理が終わりきっていない場合があるため、リスナーが登録されているかもチェックする
+            } else if (this.result.length % this.interval == 0 && this._events[this.executeEvent(index)]) {
+              this.emit(this.executeEvent(index));
+            }
+          });
+        // 設定がない場合
+        } else {
+          break;
+        }
+      }
+    });
+
+  this.emit('execute');
+}
+
+/**
+ * 処理終了後に実行すべきイベントを実行
+ * @param {number} index 設定のインデックス
+ * @param {Object} result コールバック実行結果で返したいデータ
+ */
+Scraper.prototype.executed = function(index, result) {
+  this.emit(this.executedEvent(index), index, result);
+}
+
+Scraper.prototype.executedEvent = function(index) {
+  return 'executed-' + index;
+}
+
+Scraper.prototype.executeEvent = function(index) {
+  return 'execute-' + Math.floor(index / this.interval);
+}
 
 /**
  * スクレイピング対象をローカルから読み込み、スクレイピングする
@@ -29,14 +128,14 @@ Scraper.prototype.interval = 10;
 Scraper.prototype.read = function(index) {
   console.info('local access[%s]: %s', index, this.config[index].html);
 
-  scraper = this;
+  self = this;
 
   fs.readFile(this.config[index].html, 'utf-8', function(err, data) {
     if (err) {
       throw err;
     }
 
-    scraper.emit(scraper.scrapingEventType(index), data, index);
+    self.emit(scraper.scrapingEventType(index), index, data);
   });
 }
 
@@ -55,7 +154,7 @@ Scraper.prototype.request = function(index) {
       'method': 'GET', // ひとまずGETで固定
       'path': uri.pathname + uri.search
     },
-    scraper = this;
+    self = this;
 
   var request = require('http').request(options, function(response) {
     // HTTPリクエストが失敗の場合
@@ -81,94 +180,11 @@ Scraper.prototype.request = function(index) {
         });
 
         // スクレイピング実行
-        scraper.emit(scraper.scrapingEventType(index), data, index);
+        self.emit(self.scrapingEventType(index), index, data);
       });
   });
 
   request.end();
-}
-
-/**
- * スクレイピングを実行する
- */
-Scraper.prototype.execute = function() {
-  this.result = [], indexList = [];
-
-  // 設定配列のインデックスを抽出
-  for (index in this.config) {
-    indexList.push(index);
-  }
-
-  this
-    .on('execute', function() {
-      // 一定範囲のスクレイピングが完了
-      this.once(this.scrapeEventType(indexList[0]), function() {
-        // 次の範囲のスクレイピング実行
-        this.emit('execute');
-      });
-
-      // 全て並列で処理すると落ちてしまうため
-      // intervalに設定されている数で分割して処理していく
-      for (var i = 0; i < this.interval; i++) {
-        index = indexList.shift();
-
-        if (index !== undefined) {
-          // リモートへアクセス
-          if (this.config[index].uri) {
-            this.request(index);
-          // ローカルファイル読み込み
-          } else {
-            this.read(index);
-          }
-
-          this
-            // スクレイピング対象のHTML取得後のスクレイピング処理
-            .once(this.scrapingEventType(index), function(html, index) {
-              scraper = this;
-
-              console.log('scraping[%s]', index);
-
-              // スクレイピング設定のインデックスをHTML内にコメントとして無理矢理入れこむ
-              // スクレイピングメソッドではこのコメントからインデックスを抽出し、どの設定でのスクレイピングか判別できるようにする
-              jsdom.env(
-                html.replace('</body>', '<!--' + index + '--></body>'),
-                ['http://code.jquery.com/jquery-1.5.min.js'],
-                this.config[index].scraping
-              );
-            })
-          // スクレイピング後の処理
-          .once(this.scrapedEventType(index), this.config[index].scraped)
-          // Scraper内部でのスクレイピング後の処理
-          .once(this.scrapedEventType(index), function(result, index) {
-            // スクレイピング結果を保存
-            this.result[index] = result;
-
-            console.log('scraped[%s]: %d/%d', index, this.result.length, this.config.length);
-
-            // 全てのスクレイピングが完了した場合
-            if (this.result.length == this.config.length) {
-              this.emit('scraped');
-            // 一定範囲のスクレイピングが完了したら再度スクレイピング
-            // 前回の範囲の処理が終わりきっていない場合があるため、リスナーが登録されているかもチェックする
-            } else if (this.result.length % this.interval == 0 && this._events[this.scrapeEventType(index)]) {
-              this.emit(this.scrapeEventType(index));
-            }
-          });
-        } else {
-          break;
-        }
-      }
-    });
-
-  this.emit('execute');
-}
-
-Scraper.prototype.scrapedEventType = function(index) {
-  return 'scraped-' + index;
-}
-
-Scraper.prototype.scrapeEventType = function(index) {
-  return 'execute-' + Math.floor(index / this.interval);
 }
 
 Scraper.prototype.scrapingEventType = function(index) {
@@ -178,8 +194,8 @@ Scraper.prototype.scrapingEventType = function(index) {
 Scraper.prototype.setConfig = function(config) {
   configDefault = {
     'html': './scraper.html',
-    'scraped': function() {
-      console.log('defaut scraped function');
+    'executed': function() {
+      console.log('defaut executed function');
     },
     'scraping': function(errors, window) {
       console.log('defaut scraping function');
@@ -190,7 +206,7 @@ Scraper.prototype.setConfig = function(config) {
 
   for (var i in this.config) {
     this.config[i].html = this.config[i].html || configDefault.html;
-    this.config[i].scraped = this.config[i].scraped || configDefault.scraped;
+    this.config[i].executed = this.config[i].executed || configDefault.executed;
     this.config[i].scraping = this.config[i].scraping || configDefault.scraping;
   }
 };
