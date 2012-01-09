@@ -28,19 +28,27 @@ module.exports = DB;
 
 DB.prototype.client = null;
 DB.prototype.config = null;
+DB.prototype.result = [];
+
 
 /**
  * SQL設定を元にSQLを実行する
+ * @param {Object} callback 実行後のコールバック
  */
-DB.prototype.execute = function() {
+DB.prototype.execute = function(callback) {
   try {
     this.result = [], indexList = [];
+
+    // 処理終了後のコールバックが設定されている場合
+    if (callback) {
+      this.on('executed', callback);
+    }
 
     // SQL設定数分実行
     for (index in this.config) {
       // todo 他のコールバック入れる
       // 処理実行後にクラス内部で行うイベント
-      this.once(this.executedEvent(index), function(result, index) {
+      this.once(this.executedEvent(index), function(index, result) {
         // 結果を保存
         this.result[index] = result;
     
@@ -65,27 +73,6 @@ DB.prototype.execute = function() {
   }
 }
 
-DB.prototype.result = [];
-
-DB.prototype.query = function(index) {
-  self = this;
-
-  // SQL実行
-  this.client.query(this.config[index].sql, this.config[index].parameters, function(err, results, fields) {
-      console.error(err);
-    // エラーが起こった場合
-    if (err) {
-      // エラーを結果に入れる
-      results = err;
-
-      // ログ出力（ERROR）
-      console.error(err);
-    }
-
-    self.callBackDone(index, results);
-  });
-}
-
 /**
  * コールバック処理終了後に実行すべきイベント名を返す
  * @param {number} index 設定のインデックス
@@ -99,8 +86,26 @@ DB.prototype.executedEvent = function(index) {
  * @param {number} index 設定のインデックス
  * @param {Object} result コールバック実行結果で返したいデータ
  */
-DB.prototype.callBackDone = function(index, result) {
-  this.emit(this.executedEvent(index), result, index);
+DB.prototype.executed = function(index, result) {
+  this.emit(this.executedEvent(index), index, result);
+}
+
+DB.prototype.query = function(index) {
+  self = this;
+
+  // SQL実行
+  this.client.query(this.config[index].sql, this.config[index].parameters, function(err, results, fields) {
+    // エラーが起こった場合
+    if (err) {
+      // エラーを結果に入れる
+      results = err;
+
+      // ログ出力（ERROR）
+      console.error(err);
+    }
+
+    self.executed(index, results);
+  });
 }
 
 /**

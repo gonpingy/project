@@ -1,35 +1,34 @@
 var
-  conf = require('./configuration.js'),
+  CONFIG = require('./configuration.js'),
   DB = require('../../lib/db.js'),
   fs = require('fs'),
   mysql = require('/usr/local/lib/node_modules/mysql/lib/mysql');
-
-var insertStation = function(geo) {
-  client.query('INSERT INTO station(name, prefecture_id, line_id, latlng, address) VALUES(?, ?, ?, GeomFromText(?), ?)', [], function(err, fields) {
-  });
-}
 
 dir = '/Users/gonpingy/Dropbox/Daikonactor/temp/yolp_prefecture/';
 prefectureDirList = fs.readdirSync(dir);
 
 var config_sql = []
-var sql = 'INSERT INTO station(name, prefecture_id, line_id, latlng, address) VALUES(?, ?, ?, GeomFromText(?), ?)';
+var sql = 'INSERT INTO station(name, prefecture_id, line_id, latlng, address, created) VALUES(?, ?, (SELECT id FROM line WHERE name=?), GeomFromText(?), ?, now())';
 
-for (var i in prefectureDirList) {
-  lineDirList = fs.readdirSync(dir + prefectureDirList[i]);
+prefectureList = JSON.parse(fs.readFileSync(CONFIG.HTML_PREFECTURE_LIST + '.json'));
 
-  for (var j in lineDirList) {
-    stationList = fs.readdirSync(dir + prefectureDirList[i] + '/' + lineDirList[j]);
+// 都道府県数分ループ
+for (var id in prefectureList) {
+  lineList = JSON.parse(fs.readFileSync(CONFIG.DIR_DATA + '/' + id + '/lineList.html.json'));
 
-    for (var k in stationList) {
-      file = dir + prefectureDirList[i] + '/' + lineDirList[j] + '/' + stationList[k];
+  // 路線数分ループ
+  for (var i in lineList.line) {
+    lineDir = dir + '/' + id + '/' + encodeURI(lineList.line[i].name);
+    stationFileList = fs.readdirSync(lineDir);
+    stationList = JSON.parse(fs.readFileSync(CONFIG.DIR_DATA + '/' + id + '/' + lineList.line[i].name + '/stationList.html.json'));
+
+    for (var j in stationFileList) {
+      file = lineDir + '/' + stationFileList[j];
       geo = JSON.parse(fs.readFileSync(file));
 
       if (geo['ResultInfo']['Total'] == 1) {
-        config_sql.push({
-          'sql': sql,
-          'parameters': [geo['Feature'][0]['Name'], 1, 1, 'POINT(' + geo['Feature'][0]['Geometry']['Coordinates'].replace(',', ' ') + ')', geo['Feature'][0]['Property']['Address']]
-        });
+        latlng = 'POINT(' + geo['Feature'][0]['Geometry']['Coordinates'].replace(',', ' ') + ')';
+        address = geo['Feature'][0]['Property']['Address'];
       } else if (geo.ResultInfo.Total > 1) {
         for (var l in geo['Feature']) {
           // 初めに駅が入っているものをDBに追加
@@ -38,27 +37,32 @@ for (var i in prefectureDirList) {
           }
         }
 
-        console.log('total > 1: %s', file);
+        console.info('total > 1: %s', file);
 
-        config_sql.push({
-          'sql': sql,
-          'parameters': [geo['Feature'][l]['Name'], 1, 1, 'POINT(' + geo['Feature'][l]['Geometry']['Coordinates'].replace(',', ' ') + ')', geo['Feature'][l]['Property']['Address']]
-        });
+        latlng = 'POINT(' + geo['Feature'][l]['Geometry']['Coordinates'].replace(',', ' ') + ')';
+        address = geo['Feature'][l]['Property']['Address'];
       } else {
-        console.log('total = 0: %s', file);
+        console.info('total = 0: %s', file);
+        latlng = '';
+        address = '';
       }
+
+      config_sql.push({
+        'sql': sql,
+        'parameters': [stationFileList[j].split('.').shift(), id, lineList.line[i].name, latlng, address]
+      });
     }
   }
 }
 
 var config_db = {
-  'database': conf.MYSQL_DATABASE,
-  'host': conf.MYSQL_HOST,
-  'password': conf.MYSQL_PASSWORD,
-  'user': conf.MYSQL_USER,
+  'database': CONFIG.MYSQL_DATABASE,
+  'host': CONFIG.MYSQL_HOST,
+  'password': CONFIG.MYSQL_PASSWORD,
+  'user': CONFIG.MYSQL_USER
 };
 
 db = new DB(config_db, config_sql);
-db.execute();
-db.on('executed', function() {
+db.execute(function() {
+  console.log('stations are imported');
 });

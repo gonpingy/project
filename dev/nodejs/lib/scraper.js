@@ -53,6 +53,8 @@ Scraper.prototype.execute = function(callback) {
 
         // 設定がまだある場合
         if (index !== undefined) {
+          console.log(this.config[index]);
+
           // リモートへアクセス
           if (this.config[index].uri) {
             this.request(index);

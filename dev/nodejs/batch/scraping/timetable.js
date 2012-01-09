@@ -8,141 +8,48 @@ var
   util = require('util'),
   url = require('url');
 
-// 各駅ごとの時刻表一覧JSON生成
-var generateTimeTableList = function(stationList) {
+// 各駅の時刻表ごとのJSON生成
+var generateTimeTable = function(timeTableListList) {
   try {
     config = [];
 
     // 駅ごと
-    for (var i in stationList.station) {
-      stationDir = '../data/' + stationList.pref + '/' + stationList.lineName + '/' + i;
-      console.log(stationDir);
+    for (var i = 0; i < timeTableListList.length; i++) {
+      // 時刻表ごと
+      for (var index in timeTableListList[i].timetable) {
+        stationDir = CONFIG.DIR_DATA + '/' + timeTableListList[i].prefID + '/' + timeTableListList[i].lineName + '/' + timeTableListList[i].stationName.substr(0, timeTableListList[i].stationName.length - 1);
+
+        // 路線リストスクレイピング設定作成
+        config.push({
+          'executed': function(index, result) {
+            var
+              path = this.config[index].html,
+              self = this;
     
-      // 駅ディレクトリ作成
-      try {
-        fs.readdirSync(stationDir);
-      } catch (e) {
-        fs.mkdirSync(stationDir, '0755');
-        console.log('dir: %s', stationDir);
+            // スクレイピングの結果をJSON出力
+            fs.writeFile(path + '.json', JSON.stringify(result, null, ' '), function(err) {
+              if (err) {
+                throw err;
+              }
+    
+              console.log('file[%s]: %s.json', index, path);
+            });
+          },
+          'html': stationDir + '/' + index + '.html',
+          'scraping': timetableScraping,
+          'uri': timeTableListList[i].timetable[index].uri
+        });
       }
-    
-      // 路線リストスクレイピング設定作成
-      config.push({
-        'html': stationDir + '/timetableList.html',
-        'scraped': saveFileScraped,
-        'scraping': timetableListScraping,
-        'uri': stationList.station[i].uri
-      });
     }
 
     // スクレイピング
     scraper = new Scraper(config);
-    scraper.execute();
-
-    scraper.on('scraped', function() {
-      console.log('timetableList is generated.');
-    });
-  } catch (e) {
-    console.error('error:' + e);
-  }
-}
-
-// 各駅ごとの時刻表JSON生成
-var generateTimeTable = function(timetableList) {
-  try {
-    config = [];
-
-    timetableDir = '../data/' + timetableList.pref + '/' + encodeURI(timetableList.lineName) + '/' + encodeURI(timetableList.stationName.substr(0, timetableList.stationName.length - 1)) + '/timetable';
-
-    // 駅ディレクトリ作成
-    try {
-      fs.readdirSync(timetableDir);
-    } catch (e) {
-      fs.mkdirSync(timetableDir, '0755');
-      console.log('dir: %s', timetableDir);
-    }
-    
-    // 時刻表ごと
-    for (var i in timetableList.timetable) {
-      // 路線リストスクレイピング設定作成
-      config.push({
-        'html': timetableDir + '/timetableList' + i + '.html',
-        'scraped': saveFileScraped,
-        'scraping': timetableScraping,
-        'uri': timetableList.timetable[i].uri
-      });
-    }
-
-    // スクレイピング
-    scraper = new Scraper(config);
-    scraper.execute();
-
-    scraper.on('scraped', function() {
+    scraper.execute(function() {
       console.log('timetable is generated.');
     });
   } catch (e) {
     console.error('error:' + e);
   }
-}
-
-
-var timetableListScraping = function(errors, window) {
-  var
-    $ = window.$,
-    feed = {};
-    timetable = {},
-    uri = url.parse($('#station-nav').find('ul').find('li').find('h3').find('a').attr('href').replace('\/top\/', '\/time\/'), true),
-    query = uri.query,
-    kind = query.kind;
-
-  feed = {
-    'pref': query.pref,
-    'prefName': query.prefname,
-    'companyName': query.company,
-    'lineName': query.line,
-    'uri': uri.href,
-    'stationName': $('#m-title').find('h2').text(),
-    'timetable': timetable
-  };
-
-  // 日にちごと
-  $('#timetable').find('table').find('th').find('ul').find('li').each(function() {
-    // リンクの場合
-    if ($(this).find('a').size() > 0) {
-      uri = url.parse($(this).find('a').attr('href'), true);
-      query = uri.query;
-      kind = query.kind;
-    } else {
-      kind = '1';
-    }
-
-    var goFor = $(this).text();
-    
-    // 行き先ごと
-    $('#timetable').find('ul').find('li').find('h5').each(function() {
-      // リンクの場合
-      if ($(this).find('a').size() > 0) {
-        uri = url.parse($(this).find('a').attr('href'), true);
-        query = uri.query;
-        query.kind = kind;
-      } else {
-        query.gid = '1';
-      }
-
-      timetable[query.gid + query.kind] = {
-        'gid': query.gid,
-        'kind': query.kind,
-        'date': $(this).text(),
-        'for': goFor,
-        'uri': 'http://' + uri.hostname + uri.pathname + '?' + querystring.stringify(query)
-      };
-    });
-  });
-
-  feed['timetable'] = timetable;
-
-  index = $('body').get(0).lastChild.nodeValue;
-  scraper.emit(scraper.scrapedEventType(index), feed, index);
 }
 
 var timetableScraping = function(errors, window) {
@@ -159,15 +66,31 @@ var timetableScraping = function(errors, window) {
     'prefName': query.prefname,
     'companyName': query.company,
     'lineName': query.line,
+    'gid': query.gid,
+    'kind': query.kind,
     'uri': uri.href,
     'stationName': $('#m-title').find('h2').text(),
   };
   
+  // 日にちを取得
+  $('#timetable').find('table').find('th').find('ul').find('li').each(function() {
+    if ($(this).find('a').size() == 0) {
+      feed['date'] = $(this).text();
+    }
+  });
+
+  // 行き先を取得
+  $('#timetable').find('ul').find('li').find('h5').each(function() {
+    if ($(this).find('a').size() == 0) {
+      feed['for'] = $(this).text();
+    }
+  });
+
   // 時ごと
   $('table').find('tbody').find('tr').each(function() {
     var
       tr = $(this),
-      hour = tr.find('td.col1').text(),
+      hour = tr.find('td.col1').text().replace( /^([1-9])$/, '0$1'),
       minute = ''.
       form = '',
       boundFor = '';
@@ -180,7 +103,7 @@ var timetableScraping = function(errors, window) {
         boundFor = dl.find('dd.sta-for').text();
   
         timetable[hour] = {
-          'time': hour + minute,
+          'time': hour.replace( /^([1-9])$/, '0$1') + minute,
           'form': form,
           'for': boundFor
         };
@@ -189,28 +112,56 @@ var timetableScraping = function(errors, window) {
   
   feed['timetable'] = timetable;
 
-  index = $('body').get(0).lastChild.nodeValue;
-  console.log(index, feed);
-  scraper.emit(scraper.scrapedEventType(index), feed, index);
+  // HTML内のコメントからスクレイピング設定のインデックスを抽出
+  self.executed($('body').get(0).lastChild.nodeValue, feed);
+}
+
+prefectureList = JSON.parse(fs.readFileSync(CONFIG.HTML_PREFECTURE_LIST + '.json'));
+prefectureIDList = [];
+
+timeTableListList = [];
+
+// 都道府県数分ループ
+for (var prefectureID in prefectureList) {
+  prefectureDir = CONFIG.DIR_DATA + '/' + prefectureID;
+  lineList = JSON.parse(fs.readFileSync(prefectureDir + '/lineList.html.json'));
+
+  // 路線数分ループ
+  for (var i in lineList.line) {
+    lineDir = prefectureDir + '/' + lineList.line[i].name;
+    stationList = JSON.parse(fs.readFileSync(prefectureDir + '/' + lineList.line[i].name + '/stationList.html.json'));
+
+    // 駅数分ループ
+    for (var stationName in stationList.station) {
+      timeTableListList.push(JSON.parse(fs.readFileSync(prefectureDir + '/' + lineList.line[i].name + '/' + stationName + '/timetableList.html.json')));
+    break;
+    }
+    break;
+  }
+    break;
 }
 
 // 駅ごとの時刻表一覧JSON生成
-areaIDList = [];
-for (var i = 1; i <= 5; i++) {
-  areaIDList.push(i);
+switch (process.argv.length) {
+  case 2:
+    begin = 0;
+    end = timeTableListList.length;
+    break;
+  case 3:
+    begin = process.argv[2];
+    end = timeTableListList.length;
+    break;
+  case 4:
+    begin = process.argv[2];
+    end = process.argv[3];
+    break;
+  default:
+    throw new Error('error!');
 }
 
-//var area = JSON.parse(fs.readFileSync('../data/areaList.html.json'));
-//var temp = [];
-//for (var areaID in area) {
-//  prefectureDir = '../data/' + areaID;
-//  lineList = JSON.parse(fs.readFileSync(prefectureDir + '/lineList.html.json'));
-//
-//  for (var i in lineList.line) {
-////    stationList = JSON.parse(fs.readFileSync(prefectureDir + '/' + encodeURI(lineList.line[i].name) + '/stationList.html.json'));
-//
-////    for (var j in stationList.station) {
-////      temp.push(stationList.station[j].name);
-////    }
-//  }
-//}
+if (begin < 0
+&& end > timeTableListList.length) {
+  throw new Error('error!');
+}
+
+generateTimeTable(timeTableListList.slice(begin, end));

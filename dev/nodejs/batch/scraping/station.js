@@ -11,64 +11,72 @@ var
 // 各都道府県の路線ごとの駅一覧JSON生成
 var generateStationList = function(prefectureIDList) {
   try {
-    // IDの指定がない場合
-    if (!Array.isArray(prefectureIDList) || prefectureIDList.length === 0) {
-      var
-        prefectureDir = JSON.parse(fs.readFileSync(HTML_PREFECTURE_LIST + '.json')),
-        prefectureIDList = [];
+    temp = function(interval) {
+      var config = [];
 
-      for (id in prefectureDir) {
-        prefectureIDList.push(id);
-      }
-    }
+      for (var x = 0; x < interval; x++) {
+        if (prefectureID =  prefectureIDList.shift()) {
+          prefectureDir = CONFIG.DIR_DATA + '/' + prefectureID;
+          lineList = JSON.parse(fs.readFileSync(prefectureDir + '/lineList.html.json'));
 
-    config = [];
+          // 路線ごと
+          for (var i in lineList.line) {
+            lineDir = prefectureDir + '/' + lineList.line[i].name;
 
-    // 都道府県ごと
-    while (prefectureID = prefectureIDList.shift()) {
-      prefectureDir = CONFIG.DIR_DATA + '/' + prefectureID;
-      lineList = JSON.parse(fs.readFileSync(prefectureDir + '/lineList.html.json'));
+            // 路線ごとのディレクトリ作成
+            try {
+              fs.readdirSync(lineDir);
+            } catch (e) {
+              fs.mkdirSync(lineDir, '0755');
+              console.log('dir: %s', lineDir);
+            }
 
-      // 路線ごと
-      for (var i in lineList.line) {
-        lineDir = prefectureDir + '/' + lineList.line[i].name;
+            // 路線リストスクレイピング設定作成
+            config.push({
+              'executed': function(index, result) {
+                var
+                  path = this.config[index].html,
+                  self = this;
 
-        // 路線ごとのディレクトリ作成
-        try {
-          fs.readdirSync(lineDir);
-        } catch (e) {
-          fs.mkdirSync(lineDir, '0755');
-          console.log('dir: %s', lineDir);
-        }
+                // スクレイピング結果をJSON出力
+                fs.writeFile(path + '.json', JSON.stringify(result, null, ' '), function(err) {
+                  if (err) {
+                    throw err;
+                  }
 
-        // 路線リストスクレイピング設定作成
-        config.push({
-          'executed': function(index, result) {
-            var
-              path = this.config[index].html,
-              self = this;
-
-            // スクレイピング結果をJSON出力
-            fs.writeFile(path + '.json', JSON.stringify(result, null, ' '), function(err) {
-              if (err) {
-                throw err;
-              }
-
-              console.log('file[%s]: %s.json', index, path);
+                  console.log('file[%s]: %s.json', index, path);
+                });
+              },
+              'html': lineDir + '/stationList.html',
+              'scraping': stationListScraping,
+              'uri': lineList.line[i].uri
             });
-          },
-          'html': lineDir + '/stationList.html',
-          'scraping': stationListScraping,
-          'uri': lineList.line[i].uri
-        });
+          }
+        } else {
+          break;
+        }
       }
+
+      return config;
     }
+
+    var config = temp(5);
 
     // スクレイピング
     scraper = new Scraper(config);
-    scraper.execute(function() {
+    executed = function() {
+      delete this.result;
+
+      config = temp(5);
+      
+      if (config.length != 0) {
+        this.setConfig(config);
+        this.execute(executed);
+      } else {
       console.log('stationList is generated.');
-    });
+      }
+    };
+    scraper.execute(executed);
   } catch (e) {
     console.error('error:' + e);
   }
