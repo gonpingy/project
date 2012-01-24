@@ -127,7 +127,7 @@ prefectureList = JSON.parse(fs.readFileSync(CONFIG.HTML_PREFECTURE_LIST + '.json
 prefectureIDList = [];
 
 stationListList = [];
-
+prefectureList = {'19': 0}
 // 都道府県数分ループ
 for (var prefectureID in prefectureList) {
   prefectureDir = CONFIG.DIR_DATA + '/' + prefectureID;

@@ -23,56 +23,60 @@ var import_train = function(lineDir) {
     // 時刻表数分ループ
     for (var type in timetableList.timetable) {
       console.log(lineDir + '/' + station + '/' + type + '.html.json');
-      var timetable = JSON.parse(fs.readFileSync(lineDir + '/' + station + '/' + type + '.html.json'));
+      var
+        timetable = JSON.parse(fs.readFileSync(lineDir + '/' + station + '/' + type + '.html.json')),
       i = 0;
+        goFor = timetable.for,
+        date = timetable.kind;
 
-      // 初めて存在する行き先、日にちの場合
-      if (train[type] == undefined) {
-        train[type] = {}
+      // 初めて存在する行き先の場合
+      if (train[goFor] == undefined) {
+        train[goFor] = {};
+        train[goFor][date] = {};
+      // 初めて存在する日にちの場合
+      } else if (train[goFor][date] == undefined) {
+        train[goFor][date] = {};
       }
 
       // 時間数分ループ
-      for (var time in timetable.timetable) {
+      for (var hour in timetable.timetable) {
         // 分数分ループ
-        for (index in timetable.timetable[time]) {
-          i++;
-          // 初めて存在する行き先の場合
-          if (train[type][timetable.for] == undefined) {
-            train[type][timetable.for] = {}
-          }
+        for (index in timetable.timetable[hour]) {
+          var time = timetable.timetable[hour][index];
 
           // 初めて存在する行き先の場合
-          if (train[type][timetable.for][timetable.timetable[time][index]['for']] == undefined) {
-            train[type][timetable.for][timetable.timetable[time][index]['for']] = {}
+          if (train[goFor][date][time.for] == undefined) {
+            train[goFor][date][time.for] = {}
           }
 
           // 初めて存在する電車種別の場合
-          if (train[type][timetable.for][timetable.timetable[time][index]['for']][timetable.timetable[time][index]['form']] == undefined) {
-            train[type][timetable.for][timetable.timetable[time][index]['for']][timetable.timetable[time][index]['form']] = 0;
+          if (train[goFor][date][time.for][time['form']] == undefined) {
+            train[goFor][date][time.for][time['form']] = 0;
           } else {
-            train[type][timetable.for][timetable.timetable[time][index]['for']][timetable.timetable[time][index]['form']]++;
+            train[goFor][date][time.for][time['form']]++;
           }
         }
       }
     }
   }
 
-  // 時刻表数分ループ
-  for (var type in train) {
-    // 経路数分ループ
-    for (name in train[type]) {
-      // 行き先数分ループ
-      for (goFor in train[type][name]) {
+  // 行き先数分ループ
+  for (name in train) {
+    // 日にち数分ループ
+    for (date in train[name]) {
+      // 行き先すう分ループ
+      for (goFor in train[name][date]) {
         // 列車種別数分ループ
-        for (service in train[type][name][goFor]) {
+        for (service in train[name][date][goFor]) {
           // 普通列車の場合
           if (service == '') {
             service = '普';
           }
           config_sql.push({
             'sql': sql,
-            'parameters': [name, timetable.lineName, goFor, type.substring(type.length - 1), service]
+            'parameters': [name, timetable.lineName, goFor, date, service]
           });
+          console.log(['@@@', name, timetable.lineName, goFor, date, service].join("\t"));
         }
       }
     }
@@ -88,6 +92,7 @@ var import_train = function(lineDir) {
   // インポート実行
   db = new DB(config_db, config_sql);
   db.execute(function() {
+    this.client.end();
     console.log('trains are imported');
   });
 }
@@ -98,7 +103,7 @@ if (process.argv.length == 3) {
   prefectureList = JSON.parse(fs.readFileSync(CONFIG.HTML_PREFECTURE_LIST + '.json'));
   lineNameList = {};
   prefectureList = {
-    '01': 0,
+//    '01': 0,
 //    '02': 0,
 //    '03': 0,
 //    '04': 0,
@@ -110,7 +115,7 @@ if (process.argv.length == 3) {
 //    '10': 0,
 //    '11': 0,
 //    '12': 0,
-//    '13': 0,
+    '13': 0,
 //    '14': 0,
 //    '15': 0,
 //    '16': 0,

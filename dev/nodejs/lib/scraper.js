@@ -19,7 +19,7 @@ var Scraper = function(config) {
 util.inherits(Scraper, events.EventEmitter);
 module.exports = Scraper;
 
-Scraper.prototype.interval = 10;
+Scraper.prototype.interval = 200;
 Scraper.prototype.result = [];
 
 /**
@@ -74,7 +74,7 @@ Scraper.prototype.execute = function(callback) {
               // スクレイピングメソッドではこのコメントからインデックスを抽出し、どの設定でのスクレイピングか判別できるようにする
               jsdom.env(
                 html.replace('</body>', '<!--' + index + '--></body>'),
-                ['http://code.jquery.com/jquery-1.6.min.js'],
+                ['../../lib/jquery-1.6.min.js'],
                 this.config[index].scraping
               );
             })

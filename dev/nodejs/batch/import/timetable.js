@@ -25,20 +25,21 @@ var importTimetable = function(timetableList) {
     for (var hour in timetable.timetable) {
       // 分数分ループ
       for (index in timetable.timetable[hour]) {
+        i++;
         if (timetable.timetable[hour][index]['form'] == '') {
           service = '普';
         } else {
           service = timetable.timetable[hour][index]['form'];
         }
 
+        minute = timetable.timetable[hour][index]['time'].substr(2, 2);
+
         config_sql.push({
           'sql': sql,
-          'parameters': [stationName, timetableList.lineName, timetableList.lineName, timetable.for, timetable.timetable[hour][index]['for'], timetable.kind, service, timetable.timetable[hour][index]['time'].replace( /^([0-9]{4})(.)*$/, '$100')]
+          'parameters': [stationName, timetableList.lineName, timetableList.lineName, timetable.for, timetable.timetable[hour][index]['for'], timetable.kind, service, hour + minute + '00']
         });
       }
-      break;
     }
-    break;
   }
 
   var config_db = {
@@ -47,7 +48,6 @@ var importTimetable = function(timetableList) {
     'password': CONFIG.MYSQL_PASSWORD,
     'user': CONFIG.MYSQL_USER
   };
-
   // インポート実行
   db = new DB(config_db, config_sql);
   db.execute(function() {
@@ -61,9 +61,26 @@ if (process.argv.length == 3) {
   prefectureList = JSON.parse(fs.readFileSync(CONFIG.HTML_PREFECTURE_LIST + '.json'));
   lineNameList = {};
   prefectureList = {
-    '01': 0
+    '13': 0
   };
 
+// 駅ごとの時刻表一覧JSON生成
+switch (process.argv.length) {
+  case 2:
+    begin = 0;
+    end = timeTableListList.length;
+    break;
+  case 3:
+    begin = process.argv[2];
+    end = timeTableListList.length;
+    break;
+  case 4:
+    begin = process.argv[2];
+    end = process.argv[3];
+    break;
+  default:
+    throw new Error('error!');
+}
   // 都道府県数分ループ
   for (var id in prefectureList) {
     console.log('prefecture: ' + id);
@@ -75,16 +92,25 @@ if (process.argv.length == 3) {
       var
         lineDir = prefDir + '/' + lineList.line[i].name,
         stationList = JSON.parse(fs.readFileSync(lineDir + '/stationList.html.json'));
+        stationList = JSON.parse(fs.readFileSync('/Users/gonpingy/project/station/13/大江戸線/stationList.html.json'));
+        lineDir = '/Users/gonpingy/project/station/13/大江戸線';
 
+        stationNameList = [];
       // 駅数分ループ
       for (var stationName in stationList.station) {
+        stationNameList.push(stationName);
+      }
+
+      list = stationNameList.slice(begin, end);
+
+      for (var i in list) {
         var
-          stationDir = lineDir + '/' + stationName,
+          stationDir = lineDir + '/' + list[i],
           timetableList = JSON.parse(fs.readFileSync(stationDir + '/timetableList.html.json'));
 
         importTimetable(timetableList);
-        break;
       }
+      break;
     }
   }
 }

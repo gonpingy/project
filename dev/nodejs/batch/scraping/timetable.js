@@ -55,11 +55,10 @@ var generateTimeTable = function(timeTableListList) {
 var timetableScraping = function(errors, window) {
   var
     $ = window.$,
-    feed = {};
-    timetable = {},
+    feed = {},
     uri = url.parse($('#station-nav').find('ul').find('li').find('h3').find('a').attr('href').replace('\/top\/', '\/time\/'), true),
     query = uri.query,
-    kind = query.kind;
+    timetable = {};
 
   feed = {
     'pref': query.pref,
@@ -90,23 +89,28 @@ var timetableScraping = function(errors, window) {
   $('table').find('tbody').find('tr').each(function() {
     var
       tr = $(this),
-      hour = tr.find('td.col1').text().replace( /^([1-9])$/, '0$1'),
-      minute = ''.
+      boundFor = '',
       form = '',
-      boundFor = '';
-  
+      hour = tr.find('td.col1').text() % 24;
+      hour = String(hour).replace( /^([0-9])$/, '0$1');
+
+      timetable[hour] = [];
+
       // 分ごと
       tr.find('td.col2').find('dl').each(function() {
-        var dl = $(this);
-        minute = dl.find('dt').text();
-        form = dl.find('dd.trn-cls').text();
-        boundFor = dl.find('dd.sta-for').text();
+        var
+          dl = $(this),
+          boundFor = dl.find('dd.sta-for').text(),
+          form = dl.find('dd.trn-cls').text(),
+          minute = dl.find('dt').text().replace( /^([0-9]{1,2})(.)*$/, '$1');
+          minute = minute.replace( /^([0-9])$/, '0$1');
+          minute += dl.find('dt').text().replace( /^([0-9]{1,2})(.)*$/, '$2');
   
-        timetable[hour] = {
-          'time': hour.replace( /^([1-9])$/, '0$1') + minute,
+        timetable[hour].push({
+          'time': hour + minute,
           'form': form,
           'for': boundFor
-        };
+        });
       });
   });
   
@@ -120,7 +124,7 @@ prefectureList = JSON.parse(fs.readFileSync(CONFIG.HTML_PREFECTURE_LIST + '.json
 prefectureIDList = [];
 
 timeTableListList = [];
-
+prefectureList = {'26': '01'};
 // 都道府県数分ループ
 for (var prefectureID in prefectureList) {
   prefectureDir = CONFIG.DIR_DATA + '/' + prefectureID;
@@ -133,12 +137,11 @@ for (var prefectureID in prefectureList) {
 
     // 駅数分ループ
     for (var stationName in stationList.station) {
+
+      console.log((prefectureDir + '/' + lineList.line[i].name + '/' + stationName + '/timetableList.html.json'));
       timeTableListList.push(JSON.parse(fs.readFileSync(prefectureDir + '/' + lineList.line[i].name + '/' + stationName + '/timetableList.html.json')));
-    break;
     }
-    break;
   }
-    break;
 }
 
 // 駅ごとの時刻表一覧JSON生成
@@ -158,10 +161,10 @@ switch (process.argv.length) {
   default:
     throw new Error('error!');
 }
-
+console.log(timeTableListList.length);
 if (begin < 0
 && end > timeTableListList.length) {
   throw new Error('error!');
 }
-
+//console.log(timeTableListList.slice(begin, end));
 generateTimeTable(timeTableListList.slice(begin, end));

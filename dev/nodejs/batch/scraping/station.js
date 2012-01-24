@@ -124,5 +124,6 @@ for (id in prefectureList) {
   prefectureIDList.push(id);
 }
 
+prefectureIDList = ['47'];
 // 路線ごとの駅一覧JSON生成
 generateStationList(prefectureIDList.slice(0, prefectureIDList.length));
