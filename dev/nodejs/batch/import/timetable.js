@@ -92,8 +92,8 @@ switch (process.argv.length) {
       var
         lineDir = prefDir + '/' + lineList.line[i].name,
         stationList = JSON.parse(fs.readFileSync(lineDir + '/stationList.html.json'));
-        stationList = JSON.parse(fs.readFileSync('/Users/gonpingy/project/station/13/大江戸線/stationList.html.json'));
-        lineDir = '/Users/gonpingy/project/station/13/大江戸線';
+        stationList = JSON.parse(fs.readFileSync('/Users/gonpingy/project/station/13/井の頭線/stationList.html.json'));
+        lineDir = '/Users/gonpingy/project/station/13/井の頭線';
 
         stationNameList = [];
       // 駅数分ループ

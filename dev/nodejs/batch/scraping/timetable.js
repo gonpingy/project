@@ -124,7 +124,7 @@ prefectureList = JSON.parse(fs.readFileSync(CONFIG.HTML_PREFECTURE_LIST + '.json
 prefectureIDList = [];
 
 timeTableListList = [];
-prefectureList = {'26': '01'};
+prefectureList = {'47': '01'};
 // 都道府県数分ループ
 for (var prefectureID in prefectureList) {
   prefectureDir = CONFIG.DIR_DATA + '/' + prefectureID;
