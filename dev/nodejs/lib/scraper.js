@@ -74,7 +74,7 @@ Scraper.prototype.execute = function(callback) {
               // スクレイピングメソッドではこのコメントからインデックスを抽出し、どの設定でのスクレイピングか判別できるようにする
               jsdom.env(
                 html.replace('</body>', '<!--' + index + '--></body>'),
-                ['../../lib/jquery-1.6.min.js'],
+                ['jquery-1.6.min.js'],
                 this.config[index].scraping
               );
             })

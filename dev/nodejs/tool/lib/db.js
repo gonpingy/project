@@ -52,7 +52,7 @@ DB.prototype.execute = function(callback) {
         // 結果を保存
         this.result[index] = result;
     
-        console.log('executed[%s]: %d/%d', index, this.result.length, this.config.length);
+        logger.debug('executed[%s]: %d/%d', index, this.result.length, this.config.length);
     
         // 全ての処理が完了した場合
         if (this.result.length == this.config.length) {
@@ -95,14 +95,14 @@ DB.prototype.query = function(index) {
 
   // SQL実行
   this.client.query(this.config[index].sql, this.config[index].parameters, function(err, results, fields) {
-    console.log(results);
+    logger.debug(results);
     // エラーが起こった場合
     if (err) {
       // エラーを結果に入れる
       results = err;
 
       // ログ出力（ERROR）
-      console.error(err);
+      logger.error(err);
     }
 
     self.executed(index, results);

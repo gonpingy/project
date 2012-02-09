@@ -3,6 +3,8 @@
   <head>
     <title><%= title %></title>
     <meta charset="UTF-8">
+    <!-- スマホ用 -->
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <style type="text/css">
       html, body, #map_canvas {
@@ -11,101 +13,192 @@
         height: 100%;
       }
     </style>
-    <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-    <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <script src="http://maps.googleapis.com/maps/api/js?sensor=true"></script>
+    <script type=”text/javascript” src=”http://code.google.com/apis/gears/gears_init.js“></script>
     <script src="/javascripts/jquery-1.7.1.min.js"></script>
-    <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
-    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
     <script>
-      var map, result, marker = {};
+      // http://code.google.com/intl/ja/apis/maps/documentation/javascript/basics.html#Mobile
+      function detectBrowser() {
+        var useragent = navigator.userAgent;
+        var mapdiv = document.getElementById("map_canvas");
+          
+        if (useragent.indexOf('iPhone') != -1 || useragent.indexOf('Android') != -1 ) {
+          mapdiv.style.width = '100%';
+          mapdiv.style.height = '100%';
+        } else {
+          mapdiv.style.width = '600px';
+          mapdiv.style.height = '800px';
+        }
+      } 
+
+      var map, result = {}, marker = {};
+
+      // Try W3C Geolocation (Preferred)
+      if(navigator.geolocation) {
+        browserSupportFlag = true;
+        navigator.geolocation.getCurrentPosition(function(position) {
+          initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+          map.setCenter(initialLocation);
+        }, function() {
+          initialLocation = new google.maps.LatLng(35.661637000000, 139.66656000000);
+          map.setCenter(initialLocation);
+        }); 
+      }
+
       function initialize() {
         var myOptions = {
-          zoom: 14,
           center: new google.maps.LatLng(35.661637000000, 139.66656000000),
-          mapTypeId: google.maps.MapTypeId.ROADMAP
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
+          maxZoom: 13,
+          minZoom: 12,
+          zoom: 13
         };
         map = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
 
         // 地図表示後
         google.maps.event.addListener(map, 'tilesloaded', function() {
-          bounds = map.getBounds()
-          ne = bounds.getNorthEast();
-          sw = bounds.getSouthWest();
-          date = new Date();
+          var date = new Date();
+          getTrainLoaction(date.getHours() % 24);
+        });
+      }
 
-          $.ajax({
-              'data': {
-                'begin': date.getHours() % 24,
-                'end': (date.getHours() + 1) % 24,
-                'date': 4,
-                'ne': ne.lng() + ' ' + ne.lat(),
-                'sw': sw.lng() + ' ' + sw.lat()
-              },
-              'type': 'GET',
-              'url': 'http://localhost:3001/api',
-            })
-            .success(function(data) {
-              result = data;
-              move();
-            });
+      var getTrainLoaction = function(hour) {
+        bounds = map.getBounds()
+        ne = bounds.getNorthEast();
+        sw = bounds.getSouthWest();
+        date = new Date();
+        day = date.getDay();
+        
+        if (day == 0) {
+          day = 4;
+        } else if (day == 6) {
+          day = 2;
+        } else {
+          day = 1;
+        }
+        
+        $.ajax({
+          'data': {
+            'hour': hour,
+            'date': day,
+            'ne': ne.lng() + ' ' + ne.lat(),
+            'sw': sw.lng() + ' ' + sw.lat()
+          },
+          'type': 'GET',
+          'url': './api',
+        })
+        .success(function(data) {
+          result[hour] = data;
+          result[hour + 1] = undefined;
+          move();
         });
       }
 
       $(function() {
-        google.maps.event.addDomListener(window, 'load', initialize);
-        i = 0;
+          google.maps.event.addDomListener(window, 'load', initialize);
           var date = new Date();
-          $('title').text(60 - date.getSeconds());
 
           var timerID = setTimeout(function() {
             clearTimeout(timerID);
+            requestAPI();
             move();
+            setInterval(requestAPI, 60000);
             setInterval(move, 60000);
           }, (60 - date.getSeconds()) * 1000);
       });
 
+      var requestAPI = function() {
+        var date = new Date();
+        hour = date.getHours() % 24;
+
+        if (date.getMinutes() >= 58 && result[hour + 1] == undefined) {
+          getTrainLoaction(hour + 1);
+        }
+      }
+
       var move = function() {
         var date = new Date();
-        $('title').text(date.getHours().toString().replace( /^([0-9])$/, '0$1') + date.getMinutes().toString().replace( /^([0-9])$/, '0$1'));
-        var now = date.getHours().toString().replace( /^([0-9])$/, '0$1') + ':' + date.getMinutes().toString().replace( /^([0-9])$/, '0$1') + ':00';
-        
-        if (result[now] != undefined) {
+        var now = date.getHours().toString().replace( /^([0-9])$/, '0$1') + date.getMinutes().toString().replace( /^([0-9])$/, '0$1');
+        var index = date.getHours() % 24;
+
+        // 駅に電車が停止していない時間の場合
+        if (result[index][now] != undefined) {
           for (var stationId in marker) {
             marker[stationId].setMap(null);
           }
 
           marker = {};
 
-          for (var i in result[now]) {
+          for (var i in result[index][now]) {
             // 駅IDごとにマーカーを作る
-            marker[result[now][i]['station_id']] = new google.maps.Marker({
+            marker[result[index][now][i]['station_id']] = new google.maps.Marker({
               icon: 'http://maps.google.co.jp/mapfiles/ms/icons/rail.png',
               map: map,
-              position: new google.maps.LatLng(result[now][i]['lat'], result[now][i]['lng']),
-              title: '<p>' + result[now][i]['name'] + '</p><p>' + result[now][i]['train'] + '</p>'
+              position: new google.maps.LatLng(result[index][now][i]['lat'], result[index][now][i]['lng']),
+              title: result[index][now][i]['name'] + ' ' + result[index][now][i]['for']
             });
 
-            infoWindow = new google.maps.InfoWindow({
-              position: new google.maps.LatLng(result[now][i]['lat'], result[now][i]['lng']),
-              content: '<p>' + result[now][i]['name'] + '</p><p>' + result[now][i]['train'] + '</p>'
-            });
-
-            google.maps.event.addListener(marker[result[now][i]['station_id']], 'click', function() {
-              infoWindow.open(map,  marker[result[now][i]['station_id']]);
-            });
+            result[index][now][i] = undefined;
           }
         }
       };
-//      var socket = io.connect('http://localhost:3000');
-//      socket.on('news', function (data) {
-//        alert(data);
-//        socket.emit('my other event', { my: 'data' });
-//      });
+    </script>
+    <script type="text/javascript">
+    
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27645613-1']);
+      _gaq.push(['_setDomainName', 'daikonactor.com']);
+      _gaq.push(['_trackPageview']);
+    
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    
     </script>
   </head>
   <body>
-  </head>
-  <body>
+  <div id="fb-root"></div>
+  <script>
+    // Load the SDK Asynchronously
+    (function(d){
+       var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}
+       js = d.createElement('script'); js.id = id; js.async = true;
+       js.src = "//connect.facebook.net/en_US/all.js";
+       d.getElementsByTagName('head')[0].appendChild(js);
+     }(document));
+
+    window.fbAsyncInit = function() {
+      FB.init({
+        'appId': '337733999590713', // App ID
+        'cookie': true // enable cookies to allow the server to access the session
+      });
+      
+      FB.getLoginStatus(function(response) {
+        // ログイン済み
+        if (response.status === 'connected') {
+          FB.api('/me', function(response) {
+            $('body').append('<img src="./who?who=' + response.id + ' ' + response.name + '" />');
+          });
+        // ログイン済み、アプリを追加していない
+        } else if (response.status === 'not_authorized') {
+          // the user is logged in to Facebook, 
+          //but not connected to the app
+          location.href = 'https://www.facebook.com/dialog/oauth?client_id=337733999590713&redirect_uri=http://apps.facebook.com/de-de--n/&scope=user_about_me';
+        }
+      });
+    };
+  </script>
   <%- body %>
+  <script type="text/javascript">
+var admob_vars = {
+ pubid: 'a14f31203f9f744', // publisher id
+ bgcolor: 'D9E3EC', // background color (hex)
+ text: '4C586A', // font-color (hex)
+ test: false // test mode, set to false to receive live ads
+};
+</script>
+<script type="text/javascript" src="http://mmv.admob.com/static/iphone/iadmob.js"></script>
   </body>
 </html>

@@ -92,7 +92,6 @@ var import_train = function(lineDir) {
   // インポート実行
   db = new DB(config_db, config_sql);
   db.execute(function() {
-    this.client.end();
     console.log('trains are imported');
   });
 }
@@ -115,7 +114,7 @@ if (process.argv.length == 3) {
 //    '10': 0,
 //    '11': 0,
 //    '12': 0,
-    '13': 0,
+//    '13': 0,
 //    '14': 0,
 //    '15': 0,
 //    '16': 0,

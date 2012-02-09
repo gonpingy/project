@@ -95,6 +95,7 @@ DB.prototype.query = function(index) {
 
   // SQL実行
   this.client.query(this.config[index].sql, this.config[index].parameters, function(err, results, fields) {
+    console.log(results);
     // エラーが起こった場合
     if (err) {
       // エラーを結果に入れる

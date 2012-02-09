@@ -5,14 +5,13 @@ var
   mysql = require('/usr/local/lib/node_modules/mysql/lib/mysql');
 
 var config_sql = []
-var sql = 'INSERT INTO timetable(station_id, train_id, time, created) VALUES((SELECT id FROM station WHERE name=? AND line_id=(SELECT id FROM line WHERE name=?)), (SELECT id FROM train WHERE line_id=(SELECT id FROM line WHERE name=?) AND name=? AND go_for=? AND date=? AND service=?), ?, now())';
+var sql = 'INSERT INTO timetable(station_id, hour, minutes, go_for, date, created) VALUES((SELECT id FROM station WHERE name=? AND line_id=(SELECT id FROM line WHERE name=?)), ?, ?, ?, ?, now())';
 
 
 var importTimetable = function(timetableList) {
   console.info('station: ' + timetableList.lineName + ' ' + timetableList.stationName);
 
   config_sql = [];
-  var train = {}; 
 
   // 時刻表数分ループ
   for (var type in timetableList.timetable) {
@@ -23,6 +22,8 @@ var importTimetable = function(timetableList) {
 
     // 時間数分ループ
     for (var hour in timetable.timetable) {
+      minutes = [];
+
       // 分数分ループ
       for (index in timetable.timetable[hour]) {
         i++;
@@ -32,13 +33,13 @@ var importTimetable = function(timetableList) {
           service = timetable.timetable[hour][index]['form'];
         }
 
-        minute = timetable.timetable[hour][index]['time'].substr(2, 2);
-
-        config_sql.push({
-          'sql': sql,
-          'parameters': [stationName, timetableList.lineName, timetableList.lineName, timetable.for, timetable.timetable[hour][index]['for'], timetable.kind, service, hour + minute + '00']
-        });
+        minutes.push(timetable.timetable[hour][index]['time'].substr(2, 2));
       }
+
+      config_sql.push({
+        'sql': sql,
+        'parameters': [stationName, timetableList.lineName, hour, minutes.join(','), timetable.for, timetable.kind]
+      });
     }
   }
 
@@ -48,11 +49,19 @@ var importTimetable = function(timetableList) {
     'password': CONFIG.MYSQL_PASSWORD,
     'user': CONFIG.MYSQL_USER
   };
+
+  done = false;
+
   // インポート実行
   db = new DB(config_db, config_sql);
   db.execute(function() {
-    console.log('trains are imported');
+    console.log('timetable are imported');
+    done = true;
   });
+
+  while (!done) {
+    return ;
+  }
 }
 
 if (process.argv.length == 3) {
@@ -66,20 +75,6 @@ if (process.argv.length == 3) {
 
 // 駅ごとの時刻表一覧JSON生成
 switch (process.argv.length) {
-  case 2:
-    begin = 0;
-    end = timeTableListList.length;
-    break;
-  case 3:
-    begin = process.argv[2];
-    end = timeTableListList.length;
-    break;
-  case 4:
-    begin = process.argv[2];
-    end = process.argv[3];
-    break;
-  default:
-    throw new Error('error!');
 }
   // 都道府県数分ループ
   for (var id in prefectureList) {
@@ -87,13 +82,16 @@ switch (process.argv.length) {
     var prefDir = CONFIG.DIR_DATA + '/' + id;
     var lineList = JSON.parse(fs.readFileSync(prefDir + '/lineList.html.json'));
   
+    lineList.line = lineList.line.slice(80, 85);
+
     // 路線数分ループ
     for (var i in lineList.line) {
       var
         lineDir = prefDir + '/' + lineList.line[i].name,
         stationList = JSON.parse(fs.readFileSync(lineDir + '/stationList.html.json'));
-        stationList = JSON.parse(fs.readFileSync('/Users/gonpingy/project/station/13/井の頭線/stationList.html.json'));
-        lineDir = '/Users/gonpingy/project/station/13/井の頭線';
+//      line = '京葉線';
+//        stationList = JSON.parse(fs.readFileSync('/Users/gonpingy/project/station/13/' + line + '/stationList.html.json'));
+//        lineDir = '/Users/gonpingy/project/station/13/' + line;
 
         stationNameList = [];
       // 駅数分ループ
@@ -101,6 +99,7 @@ switch (process.argv.length) {
         stationNameList.push(stationName);
       }
 
+      begin = 0, end = stationNameList.length;
       list = stationNameList.slice(begin, end);
 
       for (var i in list) {
@@ -110,7 +109,6 @@ switch (process.argv.length) {
 
         importTimetable(timetableList);
       }
-      break;
     }
   }
 }
