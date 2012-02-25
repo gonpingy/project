@@ -1,8 +1,7 @@
 var
-  domToHtml = require('/usr/local/lib/node_modules/jsdom/lib/jsdom/browser/domtohtml'),
   events = require('events'),
   fs = require('fs'),
-  jsdom = require('/usr/local/lib/node_modules/jsdom/lib/jsdom'),
+  jsdom = require('jsdom'),
   util = require('util'),
   url = require('url');
 
@@ -12,7 +11,9 @@ var
  * @constructor
  */
 var Scraper = function(config) {
-  this.setConfig(config);
+  if (config != undefined) {
+    this.setConfig(config);
+  }
 }
 
 // EventEmitterを継承
@@ -53,8 +54,6 @@ Scraper.prototype.execute = function(callback) {
 
         // 設定がまだある場合
         if (index !== undefined) {
-          console.log(this.config[index]);
-
           // リモートへアクセス
           if (this.config[index].uri) {
             this.request(index);
@@ -137,7 +136,7 @@ Scraper.prototype.read = function(index) {
       throw err;
     }
 
-    self.emit(scraper.scrapingEventType(index), index, data);
+    self.emit(self.scrapingEventType(index), index, data);
   });
 }
 
