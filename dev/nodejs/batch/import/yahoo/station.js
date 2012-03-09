@@ -1,5 +1,5 @@
 var
-  CONFIG = require('./configuration.js'),
+CONFIG = require('./constant.js'),
   DB = require('../../lib/db.js'),
   fs = require('fs'),
   mysql = require('/usr/local/lib/node_modules/mysql/lib/mysql');
