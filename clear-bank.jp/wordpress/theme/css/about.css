@@ -1,0 +1,35 @@
+#company ul {
+  list-style-type: none;
+}
+
+#company ul li {
+  float: left;
+  margin-right: 15px;
+  width: 30%;
+}
+
+#company ul li p {
+  font-size: 10px;
+  text-align: center;
+}
+
+#promise dl dt {
+  float: left;
+	margin-bottom: 10px;
+}
+
+#promise dl dd {
+	line-height: 15px;
+	margin-bottom: 10px;
+  padding-left: 110px;
+}
+
+/* 
+ * 疑似要素で回り込み解除
+ * http://www.koikikukan.com/archives/2007/02/14-003005.php
+ */
+#company ul:after {
+  clear: both;
+  content: "";
+  display: block;
+}

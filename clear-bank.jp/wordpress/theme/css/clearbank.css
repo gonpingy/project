@@ -1,0 +1,263 @@
+/**
+ * http://coliss.com/articles/build-websites/operation/work/css-tutorial-perfect-full-page-background-image.html
+ */
+#brochure {
+  left: 100px;
+  min-height: 100%;
+  min-width: 100px;
+  position: fixed;
+  top: 0;
+}
+
+body {
+  font-size: 14px;
+  font-family:"ヒラギノ明朝 Pro W6", "Hiragino Mincho Pro", "HGS明朝E", "ＭＳ Ｐ明朝", serif;
+  color: #231815;
+  margin: 0px auto;
+  width: 860px;
+}
+
+h1, h2 {
+  color: #000;
+  font-size: 128.5%;
+}
+
+h3 {
+  font-size: 114%;
+}
+
+header {
+  margin-top: 25px;
+  padding-bottom: 25px;
+  position: relative;
+  height: 125px;
+}
+
+header h1 img {
+  margin-left: 50px;
+}
+
+header nav ul {
+//  background-color: #D6EAEF;
+  border-top: solid 1px #C0C0C0;
+  border-bottom: solid 1px #C0C0C0;
+}
+
+header nav ul {
+  height: 57px;
+  margin-top: 5px;
+  position: absolute;
+  width: 100%;
+}
+
+header nav li {
+  padding-top: 9px;
+  position: absolute;
+  top: 10px;
+  width: 214px;
+  height: 30px;
+  border-right: dotted 1px #8e8e8e;
+  text-align: center;
+}
+
+header nav li:nth-child(1) {
+  height: 29px;
+  padding-top: 10px;
+}
+
+header nav li:nth-child(2) {
+  left: 215px;
+}
+
+header nav li:nth-child(3) {
+  left: 430px;
+}
+
+header nav li:nth-child(4) {
+  border-right:none;
+  left: 645px;
+}
+
+header nav li:nth-child(5) {
+  border-right:none;
+  left: 650px;
+  top: -55px;
+  width: 100px;
+}
+
+header nav li:nth-child(6) {
+  border-right:none;
+  left: 750px;
+  top: -55px;
+  width: 100px;
+}
+
+/*
+ * インデント
+ */
+p {
+  text-indent: 1em;
+}
+
+#content {
+  border-bottom: solid 2px #B6B6B6;
+}
+
+#content:after {
+  clear: both;
+  content: "";
+  display: block;
+}
+
+#content article  {
+  float: right;
+  width: 600px;
+}
+
+#content article h1 {
+  background-color: #CCCCFF;
+  background-color: #CCFFFF;
+  background-color: #F7F7F7;
+  border: solid 1px #F7F7F7;
+  border-radius: 10px;
+  font-color: #CCCC99;
+  padding: 15px 0px 15px 10px;
+}
+
+#content article section {
+  margin: 30px 0;
+}
+
+#content article > section > * {
+  margin-left: 10px;
+  margin-top: 1px;
+  padding-left: 10px;
+}
+
+/*
+ * 薄い紫 #C87DA8;
+ * 濃い紫 #8F0A61
+ * 濃い青 #6CB2D0
+ * 薄い青 #D6EAEF
+ * 黄色 #EEC976
+ */
+#content article section h2 {
+  border-bottom: solid 2px #4296BD;
+  font-color: red;
+  margin-left: 0px;
+  padding-bottom: 10px;
+}
+
+#content article section h2 + * {
+  border-top: solid 1px #4296BD;
+  padding-top: 20px;
+}
+
+#content article section h3 {
+  border-left: solid 5px #4296BD;
+  margin-bottom: 10px;
+  margin-left: 0px;
+  margin-top: 20px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+  padding-top: 5px;
+}
+
+section h4 {
+  border-bottom: solid 3px #A9DAE8;
+  margin-left: 10px;
+  margin-top: 30px;
+  padding-bottom: 7px;
+  padding-left: 10px;
+  padding-top: 3px;
+}
+
+section p {
+	line-height: 1.7;
+	margin-top: 1em;
+}
+
+section div img {
+  width: 100%;
+}
+
+section strong:before {
+  content: '「';
+}
+
+section strong {
+  font-size: normal;
+}
+
+section strong:after {
+  content: '」';
+}
+section div p strong {
+  font-weight: normal;
+  text-decoration: underline;
+}
+
+section div figure {
+  float: right;
+  margin: 1em 2px 0px 0px;
+  width: 260px;
+}
+section div figure img {
+  box-shadow: 0px 0px 4px #ddd;
+  display: block;
+  padding: 5px;
+}
+section div figure figcaption {
+  font-size: 86%;
+  padding-top: 1em;
+  text-align: center;
+}
+
+section div:after {
+  clear: both;
+  content: ""; 
+  display: block;
+}
+
+/*
+ * 左カラム
+ */
+#content aside {
+  margin-top: 30px;
+  padding-left: 5px;
+  width: 210px;
+}
+
+#content aside h2 {
+  border-bottom: solid 2px #a9dae8;
+  font-size: 114%;
+  margin-bottom: 25px;
+  padding-bottom: 10px;
+}
+
+#content aside nav a {
+  text-decoration: none;
+}
+
+footer {
+  color: #333333;
+  font-size: 10px;
+  margin: 10px 0px;
+  text-align: center;
+}
+
+footer ul {
+  margin: 20px auto;
+}
+
+footer ul li {
+  float: left;
+  list-style: none;
+  margin-left: 100px;
+}
+
+footer ul:after {
+  clear: both;
+  content: ""; 
+  display: block;
+}

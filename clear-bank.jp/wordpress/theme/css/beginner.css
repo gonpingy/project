@@ -1,0 +1,10 @@
+#type dl dt {
+  float: left;
+  margin-bottom: 10px;
+}
+
+#type dl dd {
+  line-height: 15px;
+  margin-bottom: 10px;
+  padding-left: 150px;
+}
