@@ -17,6 +17,7 @@ require_once(get_template_directory() . '/config.php');
   <!-- リセットCSS http://html5doctor.com/html-5-reset-stylesheet/ -->
   <link rel="stylesheet" href="<?php echo get_bloginfo('template_url') . CLEAR_BANK_PATH_CSS; ?>/html5reset-1.6.1.css" />
   <link rel="stylesheet" href="<?php echo get_bloginfo('template_url') . CLEAR_BANK_PATH_CSS; ?>/clearbank.css" />
+  <link href="http://www.clear-bank.jp/wp-content/themes/clear-bank.jp/favicon.ico" rel="shortcut icon">
   <?php // トップページの場合 ?>
   <?php if (get_page_link() == get_bloginfo('home') . CLEAR_BANK_PATH_TOP): ?>
   <link rel="stylesheet" href="<?php echo get_bloginfo('template_url') . CLEAR_BANK_PATH_CSS; ?>/index.css" />
