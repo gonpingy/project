@@ -12,7 +12,7 @@ require_once(get_template_directory() . '/config.php');
 <html lang="ja" dir="ltr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="keywords" content="HandiHouse Project,HandiHouse,坂田裕貴,cacco design studio,中田裕一,中田製作所,加藤渓一,studio PEACE sign,荒木伸哉,サウノル製作所" />
+  <meta name="keywords" content="HandiHouse Project,HandiHouse,坂田裕貴,cacco design studio,中田裕一,中田製作所,加藤渓一,studio PEACE sign,荒木伸哉,サウノル製作所、ハンディハウスプロジェクト" />
   <title>HandiHouse Project</title>
   <!-- リセットCSS http://html5doctor.com/html-5-reset-stylesheet/ -->
   <link rel="stylesheet" href="<?php echo get_bloginfo('template_url') . H2PJ_PATH_CSS; ?>/html5reset-1.6.1.css" />
