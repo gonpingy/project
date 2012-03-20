@@ -10,9 +10,6 @@
     -->
     <div>Copyright© CLEAR BANK CO., LTD. All Rights Reserved.</div>
   </footer>
-  <!--[if lt IE 9]>
-  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-  <![endif]-->
   <script src="<?php echo get_bloginfo('template_url') . CLEAR_BANK_PATH_JS; ?>/jquery-1.7.1.min.js"></script>
   <script>
     $(function() {

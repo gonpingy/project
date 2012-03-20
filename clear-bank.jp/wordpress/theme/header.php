@@ -33,11 +33,14 @@ require_once(get_template_directory() . '/config.php');
   <?php elseif (get_page_link() == get_bloginfo('home') . CLEAR_BANK_PATH_ABOUT): ?>
   <link rel="stylesheet" href="<?php echo get_bloginfo('template_url') . CLEAR_BANK_PATH_CSS; ?>/about.css" />
   <?php endif; ?>
+  <!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
 </head>
 <body>
   <?php // topページ以外の場合 ?>
   <?php if (get_page_link() != get_bloginfo('home') . CLEAR_BANK_PATH_TOP): ?>
-  <div><img id="brochure" src="<?php echo get_bloginfo('template_url') . CLEAR_BANK_PATH_IMAGE; ?>/brochure.gif" /></div>
+  <div id="brochure"><img src="<?php echo get_bloginfo('template_url') . CLEAR_BANK_PATH_IMAGE; ?>/brochure.gif" /></div>
   <?php endif; ?>
   <header>
   <h1><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_TOP; ?>"><img src="<?php echo get_bloginfo('template_url') . CLEAR_BANK_PATH_IMAGE; ?>/logo.gif" alt="Clear Bank CO., LTD."/></a></h1>
