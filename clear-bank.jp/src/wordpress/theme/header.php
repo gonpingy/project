@@ -46,10 +46,10 @@ require_once(get_template_directory() . '/config.php');
   <h1><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_TOP; ?>"><img src="<?php echo get_bloginfo('template_url') . CLEAR_BANK_PATH_IMAGE; ?>/logo.gif" alt="Clear Bank CO., LTD."/></a></h1>
     <nav>
       <ul>
-        <li><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_PERSONAL; ?>">個人のお客様</a></li>
-        <li><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_BEGINNER; ?>">初めての資産運用</a></li>
-        <li><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_COMPLIANCE; ?>">コンプライアンス</a></li>
-        <li><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_ABOUT; ?>">Clear Bankについて</a></li>
+        <li id="personal"><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_PERSONAL; ?>">個人のお客様</a></li>
+        <li id="beginner"><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_BEGINNER; ?>">初めての資産運用</a></li>
+        <li id="compliance"><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_COMPLIANCE; ?>">コンプライアンス</a></li>
+        <li id="about"><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_ABOUT; ?>">Clear Bankについて</a></li>
         <!--
         <li><a href="./corporate.html">企業情報</a></li>
         <li><a href="./faq.html">よくあるご質問</a></li>

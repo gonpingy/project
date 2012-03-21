@@ -2,11 +2,11 @@
  * http://coliss.com/articles/build-websites/operation/work/css-tutorial-perfect-full-page-background-image.html
  */
 #brochure {
-  left: 20px;
+  left: 0px;
   min-height: 100%;
   min-width: 100px;
   position: fixed;
-  top: 0;
+  top: 0px;
 }
 
 body {
@@ -60,20 +60,20 @@ header nav li {
   text-align: center;
 }
 
-header nav li:nth-child(1) {
+#personal {
   height: 29px;
   padding-top: 10px;
 }
 
-header nav li:nth-child(2) {
+#beginner {
   left: 215px;
 }
 
-header nav li:nth-child(3) {
+#compliance {
   left: 430px;
 }
 
-header nav li:nth-child(4) {
+#about {
   border-right:none;
   left: 645px;
 }
