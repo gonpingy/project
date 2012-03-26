@@ -1,11 +1,20 @@
-header h1 {
+header h1,
+header h2 {
   text-align: center;
+  margin: 80px auto;
+}
+
+header h1 {
+  margin-bottom: 0px;
+}
+
+header h2 {
+  margin-top: 20px;
 }
 
 header h1 img {
-  margin: 100px auto;
 }
 
 header nav ul {
-  top: 250px;
+  top: 300px;
 }

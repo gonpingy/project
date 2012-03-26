@@ -43,7 +43,14 @@ require_once(get_template_directory() . '/config.php');
   <div id="brochure"><img src="<?php echo get_bloginfo('template_url') . CLEAR_BANK_PATH_IMAGE; ?>/brochure.gif" /></div>
   <?php endif; ?>
   <header>
+  <?php // topページの場合 ?>
+  <?php if (get_page_link() == get_bloginfo('home') . CLEAR_BANK_PATH_TOP): ?>
+  <h1><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_TOP; ?>"><img src="<?php echo get_bloginfo('template_url') . CLEAR_BANK_PATH_IMAGE; ?>/top_logo.gif" alt="Clear Bank CO., LTD."/></a></h1>
+  <h2>Clear Bank CO., LTD.</h2> 
+  <?php // topページ以外の場合 ?>
+  <?php else: ?>
   <h1><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_TOP; ?>"><img src="<?php echo get_bloginfo('template_url') . CLEAR_BANK_PATH_IMAGE; ?>/logo.gif" alt="Clear Bank CO., LTD."/></a></h1>
+  <?php endif; ?>
     <nav>
       <ul>
         <li id="personal"><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_PERSONAL; ?>">個人のお客様</a></li>
