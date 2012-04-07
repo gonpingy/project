@@ -21,7 +21,7 @@ util.inherits(RouteImporter, Importer);
  * 処理実行後のコールバック関数　
  */
 RouteImporter.prototype.executed = function() {
-  console.log('stations are imported.');
+  console.log('routes are imported.');
 };
 
 /**

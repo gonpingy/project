@@ -93,13 +93,8 @@ class BatchRequester {
     // URLリスト設定
     $this->setUrlList();
 
-    while ((count($this->url_list) / $this->config['results']) + 1 >= $this->config['start']) {
-      Logger::log('index: ' . $this->config['start'] . PHP_EOL);
-
-      // HTMLを保存
-      $this->saveHTMLList();
-      $this->config['start']++;
-    }
+    // HTMLを保存
+    $this->saveHTMLList();
 
     // エラーがあった場合
     if ($this->is_error_flag) {
@@ -164,23 +159,29 @@ class BatchRequester {
    * @return void
    */
   protected function saveHTMLList() {
-    // HTMLを取得
-    $requester = new Requester(array_slice($this->url_list, ($this->config['start'] - 1) * $this->config['results'], $this->config['results']));
-    $result = $requester->execute();
+    while ((count($this->url_list) / $this->config['results']) + 1 >= $this->config['start']) {
+      Logger::log('index: ' . $this->config['start'] . PHP_EOL);
 
-    // 結果数分ループ
-    foreach ($result as $url => $response) {
-      // HTTPリクエスト成功、コンテンツが空でない場合
-      if ($response['status'] == 200 && $response['content'] != '') {
-        // ファイル作成
-        $this->createFile($this->getFilePath($url), $response['content']);
-      // HTTPリクエスト失敗 or コンテンツが空の場合
-      } else {
-        echo 'failed: ' . $url . PHP_EOL;
-        Logger::log('failed: ' . $url . PHP_EOL);
+      // HTMLを取得
+      $requester = new Requester(array_slice($this->url_list, ($this->config['start'] - 1) * $this->config['results'], $this->config['results']));
+      $result = $requester->execute();
 
-        $this->is_error_flag = true;
+      // 結果数分ループ
+      foreach ($result as $url => $response) {
+        // HTTPリクエスト成功、コンテンツが空でない場合
+        if ($response['status'] == 200 && $response['content'] != '') {
+          // ファイル作成
+          $this->createFile($this->getFilePath($url), $response['content']);
+        // HTTPリクエスト失敗 or コンテンツが空の場合
+        } else {
+          echo 'failed: ' . $url . PHP_EOL;
+          Logger::log('failed: ' . $url . PHP_EOL);
+
+          $this->is_error_flag = true;
+        }
       }
+
+      $this->config['start']++;
     }
   }
 

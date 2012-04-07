@@ -21,7 +21,7 @@ util.inherits(StationImporter, Importer);
  * 処理実行後のコールバック関数　
  */
 StationImporter.prototype.executed = function() {
-  console.log('routes are imported.');
+  console.log('stations are imported.');
 };
 
 /**
@@ -52,7 +52,7 @@ StationImporter.prototype.setConfigByLineId = function(lineId) {
   for (var stationId in line.station) {
     this.config.push({
       'sql': sql,
-      'parameters': [line.station[stationId].id, line.station[stationId].name, line.station[stationId].pref]
+      'parameters': [line.station[stationId].id, line.station[stationId].name, line.station[stationId].pref.replace(/^(.*)・.*$/, '$1')]
     });
   }
 };
