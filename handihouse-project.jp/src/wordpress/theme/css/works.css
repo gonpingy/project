@@ -112,3 +112,7 @@ article#works ul li dl dd {
 article#works ul li dl dd.title {
   font-size: 10pt;
 }
+
+article#works ul li dl dd a {
+  color: #FFFFFF;
+}

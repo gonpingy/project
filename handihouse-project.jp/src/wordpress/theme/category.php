@@ -44,8 +44,8 @@ get_header();
 <li><?php the_time('Y.m.d'); ?></li>
 <li><?php the_category(', '); ?></li>
 <li><a href="<?php the_permalink(); _e('#comment');?>"><?php comments_number('コメント (0)', 'コメント (1)', 'コメント (%)'); ?></a></li>
-<li><div class="fb-like" data-href="<?php the_permalink(); ?>" data-send="false" data-layout="button_count" data-width="450" data-show-faces="false"></div></li>
 </ul>
+<div class="fb-like" data-href="<?php the_permalink(); ?>" data-send="true" data-width="450" data-show-faces="true"></div>
 </footer>
 </article>
 <?php endwhile; ?>
