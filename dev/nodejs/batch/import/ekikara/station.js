@@ -38,10 +38,12 @@ StationImporter.prototype.setConfigByLineId = function(lineId) {
           '( ' +
             'ekikara_id, ' +
             'name, ' +
+            'furigana, ' +
             'prefecture_id, ' +
             'created ' +
           ') ' +
           'VALUES( ' +
+            '?, ' +
             '?, ' +
             '?, ' +
             '(SELECT id FROM prefecture WHERE name=?), ' +
@@ -52,7 +54,7 @@ StationImporter.prototype.setConfigByLineId = function(lineId) {
   for (var stationId in line.station) {
     this.config.push({
       'sql': sql,
-      'parameters': [line.station[stationId].id, line.station[stationId].name, line.station[stationId].pref.replace(/^(.*)・.*$/, '$1')]
+      'parameters': [line.station[stationId]['id'], line.station[stationId]['name'], line.station[stationId]['furigana'], line.station[stationId]['pref'].replace(/^(.*)・.*$/, '$1')]
     });
   }
 };

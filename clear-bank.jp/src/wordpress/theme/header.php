@@ -45,7 +45,7 @@ require_once(get_template_directory() . '/config.php');
   <header>
   <?php // topページの場合 ?>
   <?php if (get_page_link() == get_bloginfo('home') . CLEAR_BANK_PATH_TOP): ?>
-  <h1><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_TOP; ?>"><img src="<?php echo get_bloginfo('template_url') . CLEAR_BANK_PATH_IMAGE; ?>/top_logo.gif" alt="Clear Bank CO., LTD."/></a></h1>
+  <h1><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_TOP; ?>"><img src="<?php echo get_bloginfo('template_url') . CLEAR_BANK_PATH_IMAGE; ?>/top_logo.png" alt="Clear Bank CO., LTD."/></a></h1>
   <h2>Clear Bank CO., LTD.</h2> 
   <?php // topページ以外の場合 ?>
   <?php else: ?>

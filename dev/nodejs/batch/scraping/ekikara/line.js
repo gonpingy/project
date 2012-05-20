@@ -59,13 +59,15 @@ LineGenerator.prototype.scraping = function(errors, window) {
 
   // 駅数分ループ
   $('td.lowBg01 td.lowBg06 span.l a').each(function() {
-    var stationId = $(this).attr('href').substring(11, 19);
+    var a = $(this);
+    var stationId = a.attr('href').substring(11, 19);
 
     feed['station'].push({
       'id': stationId,
-      'name': $(this).find('span').text().replace(/^(.*)\(.*$/, '$1'),
-      'pref': $(this).find('span').text().replace(/^(.*)\((.*)\)$/, '$2'),
-      'uri': $(this).attr('href').replace('../', baseUrl)
+      'name': a.find('span').text().replace(/^(.*)\(.*$/, '$1'),
+      'furigana': a.parent().html().replace(/^.+\<br\>(.+)$/, '$1'),
+      'pref': a.find('span').text().replace(/^(.*)\((.*)\)$/, '$2'),
+      'uri': a.attr('href').replace('../', baseUrl)
     });
   });
 

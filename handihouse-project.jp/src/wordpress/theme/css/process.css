@@ -31,11 +31,18 @@ article#process ul li {
 
 article#process ul li.left {
   margin-left: 0px;
+  clear: both;
 }
 
 article#process ul li div img {
-  width: 294px;
   height: 220px;
+  width: 294px;
+}
+
+/* 縦向き写真 */
+article#process ul li div img.vertical {
+  padding: 0 62px;
+  width: 169px;
 }
 
 article#process ul li p {

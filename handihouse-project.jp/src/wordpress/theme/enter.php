@@ -18,7 +18,11 @@ the_content();
 (function() {
   // ランダムに画像を表示
   photoList = $('div.photo');
-  photoList.get(Math.floor(Math.random() * photoList.size())).style.display = 'block';
+
+  // 画像がある場合
+  if (photoList.size() > 0) {
+    photoList.get(Math.floor(Math.random() * photoList.size())).style.display = 'block';
+  }
 })();
 </script>
 <?php
