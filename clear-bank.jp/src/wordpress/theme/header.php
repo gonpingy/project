@@ -24,9 +24,6 @@ require_once(get_template_directory() . '/config.php');
   <?php // personalページの場合 ?>
   <?php elseif (get_page_link() == get_bloginfo('home') . CLEAR_BANK_PATH_PERSONAL): ?>
   <link rel="stylesheet" href="<?php echo get_bloginfo('template_url') . CLEAR_BANK_PATH_CSS; ?>/personal.css" />
-  <?php // beginnerページの場合 ?>
-  <?php elseif (get_page_link() == get_bloginfo('home') . CLEAR_BANK_PATH_BEGINNER): ?>
-  <link rel="stylesheet" href="<?php echo get_bloginfo('template_url') . CLEAR_BANK_PATH_CSS; ?>/beginner.css" />
   <?php // complianceページの場合 ?>
   <?php elseif (get_page_link() == get_bloginfo('home') . CLEAR_BANK_PATH_COMPLIANCE): ?>
   <?php // aboutページの場合 ?>
@@ -41,10 +38,11 @@ require_once(get_template_directory() . '/config.php');
   <?php // topページ以外の場合 ?>
   <?php if (get_page_link() != get_bloginfo('home') . CLEAR_BANK_PATH_TOP): ?>
   <div id="brochure"><img src="<?php echo get_bloginfo('template_url') . CLEAR_BANK_PATH_IMAGE; ?>/brochure.gif" /></div>
+  <header id="common">
   <?php endif; ?>
-  <header>
   <?php // topページの場合 ?>
   <?php if (get_page_link() == get_bloginfo('home') . CLEAR_BANK_PATH_TOP): ?>
+  <header id="top">
   <h1><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_TOP; ?>"><img src="<?php echo get_bloginfo('template_url') . CLEAR_BANK_PATH_IMAGE; ?>/top_logo.png" alt="Clear Bank CO., LTD."/></a></h1>
   <h2>Clear Bank CO., LTD.</h2> 
   <?php // topページ以外の場合 ?>
@@ -52,15 +50,36 @@ require_once(get_template_directory() . '/config.php');
   <h1><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_TOP; ?>"><img src="<?php echo get_bloginfo('template_url') . CLEAR_BANK_PATH_IMAGE; ?>/logo.gif" alt="Clear Bank CO., LTD."/></a></h1>
   <?php endif; ?>
     <nav>
-      <ul>
+      <ul id="menu">
+        <li id="about"><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_ABOUT; ?>">企業情報</a></li>
         <li id="personal"><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_PERSONAL; ?>">個人のお客様</a></li>
-        <li id="beginner"><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_BEGINNER; ?>">初めての資産運用</a></li>
         <li id="compliance"><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_COMPLIANCE; ?>">コンプライアンス</a></li>
-        <li id="about"><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_ABOUT; ?>">Clear Bankについて</a></li>
         <!--
         <li><a href="./corporate.html">企業情報</a></li>
         <li><a href="./faq.html">よくあるご質問</a></li>
         -->
       </ul>
+      <?php // topページの場合 ?>
+      <?php if (get_page_link() == get_bloginfo('home') . CLEAR_BANK_PATH_TOP): ?>
+      <div id="subMenu">
+        <ul id="subabout">
+          <li><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_ABOUT; ?>#scope">事業紹介</a></li>
+          <li><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_ABOUT; ?>#company">本社・支店のご案内</a></li>
+          <li><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_ABOUT; ?>#concept">企業理念</a></li>
+          <li><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_ABOUT; ?>#greeting">代表挨拶</a></li>
+          <li><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_ABOUT; ?>#promise">お客様とのお約束</a></li>
+        </ul>
+        <ul id="subpersonal">
+          <li><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_PERSONAL; ?>#investment">資産運用について</a></li>
+          <li><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_PERSONAL; ?>#instrument">商品のご紹介</a></li>
+          <li><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_PERSONAL; ?>#merit">7つのメリット</a></li>
+        </ul>
+        <ul id="subcompliance">
+          <li><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_COMPLIANCE; ?>#about">コンプライアンスとは</a></li>
+          <li><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_COMPLIANCE; ?>#rule">主なお客様保護のルール</a></li>
+          <li><a href="<?php echo get_bloginfo('home') . CLEAR_BANK_PATH_COMPLIANCE; ?>#promise">各種届け出</a></li>
+        </ul>
+      </div>
+      <?php endif; ?>
     </nav>
   </header>

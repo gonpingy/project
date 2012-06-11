@@ -25,11 +25,11 @@
 
 dl dt {
   float: left;
-	margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 dl dd {
-	line-height: 15px;
-	margin-bottom: 10px;
+  line-height: 15px;
+  margin-bottom: 10px;
   padding-left: 110px;
 }

@@ -36,45 +36,44 @@ header h1 img {
   margin-left: 50px;
 }
 
-header nav ul {
+#common ul {
 //  background-color: #D6EAEF;
   border-top: solid 1px #C0C0C0;
   border-bottom: solid 1px #C0C0C0;
 }
 
-header nav ul {
+#common ul {
   height: 57px;
   margin-top: 5px;
   position: absolute;
   width: 100%;
 }
 
-header nav li {
+#common ul li {
+  border-right: dotted 1px #8e8e8e;
+  font-size: 18px;
+  height: 30px;
   padding-top: 9px;
   position: absolute;
+  text-align: center;
   top: 10px;
   width: 214px;
-  height: 30px;
-  border-right: dotted 1px #8e8e8e;
-  text-align: center;
 }
 
-#personal {
+#common #about {
   height: 29px;
+  left: 20px;
   padding-top: 10px;
 }
 
-#beginner {
-  left: 215px;
+#common #personal {
+  left: 290px;
+  padding-right: 40px;
 }
 
-#compliance {
-  left: 430px;
-}
-
-#about {
+#common #compliance {
   border-right:none;
-  left: 645px;
+  left: 590px;
 }
 
 header nav li:nth-child(5) {
