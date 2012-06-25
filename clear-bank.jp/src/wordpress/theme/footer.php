@@ -22,9 +22,13 @@
     showSubMenu('about');
 
     function showSubMenu(id) {
-      id = typeof(id) == 'string' ? id : this.id;
+      var
+        id = typeof(id) == 'string' ? id : this.id,
+        subMenu = $('#sub' + id).find('li');
+
+      $('#menu').find('li').css('background-color', '#F7F7F7');
+      $(this).css('background-color', '#FCFCFB');
       $('#subMenu').find('ul').hide();
-      var subMenu = $('#sub' + id).find('li');
       
       if (subMenu.length > 3) {
         var leftDefault = 20;

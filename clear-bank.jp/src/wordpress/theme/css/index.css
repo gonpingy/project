@@ -1,3 +1,7 @@
+body {
+  background-color: #8BCCF7;
+}
+
 #top h1,
 #top h2 {
   text-align: center;
@@ -17,33 +21,40 @@
 }
 
 #top nav {
+  background-image: url("http://localhost/~gonpingy/clearbank/wp-content/uploads/2012/02/001resize.jpg");
   border: 1px #A9DAE8 solid;
   height: 300px;
   margin-top: 40px;
   margin-bottom: 40px;
+  width: 860px;
 }
 
 #top nav ul {
-  background-color: #F7F7F7;
+//  background-color: #6A8DE4;
+//  background-color: #F7F7F7;
   float: left;
-  width: 300px;
+//  width: 300px;
 }
 
 #top nav ul li {
   border-top: 1px #A9DAE8 solid;
-  font-size: 25px;
   height: 100px;
   line-height: 100px;
   padding-left: 20px;
+  padding-right: 20px;
+}
+
+#top nav ul#menu li {
+  background-color: #F7F7F7;
+}
+
+#top nav ul#menu li a {
+//  color: #FFFFFF;
+  font-size: 20px;
 }
 
 #top nav ul li:first-child {
   border-top: none;
-}
-
-#subMenu {
-  background-image: url("http://localhost/~gonpingy/clearbank/wp-content/uploads/2012/02/001.jpg");
-  height: 100%;
 }
 
 #top nav #subMenu ul {
@@ -53,7 +64,7 @@
 
 #top nav #subMenu ul li {
   background-color: #FCFCFB;
-  border: 3px #A9DAE8 solid;
+  border: 1px #A9DAE8 solid;
   font-size: 20px;
   height: 40px;
   line-height: 38px;
@@ -68,7 +79,7 @@
 }
 
 #content h3 {
-  border-bottom: 2px solid #A9DAE8;
+  border-bottom: 2px solid #4296BD;
   font-color: #2D2D2D;
   margin-bottom: 15px;
   padding-bottom: 10px;
