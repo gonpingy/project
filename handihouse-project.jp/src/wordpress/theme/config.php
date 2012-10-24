@@ -9,6 +9,7 @@ define('H2PJ_PATH_TOP', '/');
 define('H2PJ_PATH_ABOUT', '/about/');
 define('H2PJ_PATH_PROFILE', '/profile/');
 define('H2PJ_PATH_WORKS', '/works/');
+define('H2PJ_PATH_DIARY', '/diary/');
 define('H2PJ_PATH_BLOG', '/blog/');
 define('H2PJ_PATH_CONTACT', '/contact/');
 define('H2PJ_PATH_ABOUT_CONCEPT', '/about/concept/');
