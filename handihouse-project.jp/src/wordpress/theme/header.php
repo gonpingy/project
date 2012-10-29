@@ -96,7 +96,7 @@ require_once(get_template_directory() . '/config.php');
         <li><a href="<?php echo get_bloginfo('home') . H2PJ_PATH_ABOUT; ?>"<?php echo $list_class['about']; ?>>about</a></li>
         <li><a href="<?php echo get_bloginfo('home') . H2PJ_PATH_PROFILE; ?>"<?php echo $list_class['profile']; ?>>profile</a></li>
         <li><a href="<?php echo get_bloginfo('home') . H2PJ_PATH_WORKS; ?>"<?php echo $list_class['works']; ?>>works</a></li>
-        <li><a href="<?php echo get_bloginfo('home') . H2PJ_PATH_DIARY; ?>"<?php echo $list_class['diary']; ?>>diary</a></li>
+        <li><a href="<?php echo get_bloginfo('home') . H2PJ_PATH_DIARY; ?>"<?php echo $list_class['diary']; ?>>exchange diary</a></li>
         <li><a href="<?php echo get_bloginfo('home') . H2PJ_PATH_BLOG; ?>"<?php echo $list_class['blog']; ?>>blog</a></li>
         <li><a href="<?php echo get_bloginfo('home') . H2PJ_PATH_CONTACT; ?>"<?php echo $list_class['contact']; ?>>contact</a></li>
       </ul>
